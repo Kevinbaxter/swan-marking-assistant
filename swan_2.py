@@ -19,16 +19,31 @@ st.set_page_config(
 )
 
 # -----------------------------
+# Custom Header + Logo
+# -----------------------------
+st.markdown(
+    """
+    <div style='text-align:center; margin-bottom: 20px;'>
+        <img src='https://raw.githubusercontent.com/Kevinbaxter/swan-marking-assistant/main/kclogo.png' 
+             width='300' style='margin-bottom:10px;'/>
+        <h1 style='color:#ffffff;'>SWAN Marking Assistant</h1>
+        <p style='font-size:18px; color:#cccccc;'>
+            Upload a document and receive structured Strengths, Weaknesses, Actions and Next Steps.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# -----------------------------
 # Text extraction helpers
 # -----------------------------
 def extract_text_from_docx(file):
-    """Extract paragraphs from a Word document."""
     doc = Document(file)
     paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
     return doc, paragraphs
 
 def extract_text_from_xlsx(file):
-    """Extract text-like content from all sheets in an Excel workbook."""
     xls = pd.ExcelFile(file)
     text_blocks = []
 
@@ -41,7 +56,6 @@ def extract_text_from_xlsx(file):
     return None, text_blocks
 
 def extract_text_from_pptx(file):
-    """Extract text from all slides in a PowerPoint presentation."""
     prs = Presentation(file)
     text_blocks = []
 
@@ -140,17 +154,14 @@ def run_swan_analysis(file, ext):
 # -----------------------------
 # UI
 # -----------------------------
-st.title("🦢 SWAN Marking Assistant")
-
-st.markdown(
-    "Upload a **Word, Excel, or PowerPoint** file and get structured "
-    "**Strengths, Weaknesses, Actions, and Next Steps** feedback."
-)
-
 uploaded = st.file_uploader(
     "Upload a document (.docx, .xlsx, .pptx)",
     type=["docx", "xlsx", "pptx"]
 )
+
+# Reset button
+if st.button("🔄 Reset"):
+    st.experimental_rerun()
 
 if uploaded:
     ext = os.path.splitext(uploaded.name)[1].lower()
@@ -187,9 +198,6 @@ if uploaded:
     else:
         st.write("No next steps generated.")
 
-    # -----------------------------
-    # TXT DOWNLOAD BUTTON
-    # -----------------------------
     st.divider()
 
     report_text = f"SWAN Feedback Report: {uploaded.name}\n"
